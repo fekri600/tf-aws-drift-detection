@@ -1,7 +1,7 @@
 .ONESHELL:
 .SHELLFLAGS = -e -o pipefail -c
 
-deploy:
+apply:
 	@echo " Deploying bootstrap ..."
 	terraform init && terraform apply -auto-approve
 	
