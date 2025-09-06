@@ -3,9 +3,7 @@ resource "aws_s3_bucket" "demo" {
   
   force_destroy = true
 
-  tags = {
-    Project = "Terraform Drift Demo"
-  }
+
 }
 
 resource "aws_s3_bucket_versioning" "demo" {
