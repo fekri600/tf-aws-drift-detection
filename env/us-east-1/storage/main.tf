@@ -5,6 +5,9 @@ resource "aws_s3_bucket" "demo" {
   tags = {
     Project = "Terraform Drift Demo"
   }
+
+  tags = {
+  }
 }
 
 resource "random_id" "suffix" {
