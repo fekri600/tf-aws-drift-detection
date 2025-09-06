@@ -13,20 +13,27 @@ This repository contains a GitHub Actions workflow and a Python patcher that:
 
 ## What is Terraform drift? (and why this repo exists)
 
-**Terraform drift** is when the **real infrastructure in your cloud** no longer matches what’s declared in your **Terraform code**. It happens after manual console edits, emergency hotfixes, scripts/tools that bypass Terraform, or provider-side defaults changing. Terraform surfaces drift when you run `terraform plan` by comparing your desired configuration to the actual remote state through the provider APIs.
+**Terraform drift** is when the **real infrastructure in your cloud** no longer matches what’s declared in your **Terraform code**.  
+It happens after manual console edits, emergency hotfixes, scripts/tools that bypass Terraform, or provider-side defaults changing.  
 
-**Why drift matters**
+Terraform surfaces drift when you run `terraform plan` by comparing your desired configuration to the actual remote state through the provider APIs.
 
+### Why drift matters
 - **Reliability:** unexpected diffs at apply time can break rollouts.
 - **Security & compliance:** untracked changes (e.g., widened SG rules, disabled versioning) can violate policy.
 - **Single source of truth:** code stops reflecting reality, reviews and audits become harder.
 
-**Two common responses to drift**
-
+### Two common responses to drift
 1. **Push infra back to code’s intent** (standard `terraform apply`): keep code as the source of truth and revert manual edits.  
 2. **Pull live state back into code** (this repo): treat the *current cloud state* as the temporary truth and **update the `.tf` files** to match it, via PR review.
 
 This project automates option **(2)** — turning drift from a surprise into an actionable **PR diff**.
+
+---
+
+## Architecture Diagram
+
+![Terraform Drift Detection Architecture](diagram.png) 
 
 ---
 
@@ -60,46 +67,43 @@ All synced **from live state → code** using `plan.before`.
 
 ---
 
-## Repository layout
+## Tutorial: Using This Project
 
+### 1. Bootstrap the repo (once)
+In the `main` branch, include a **bootstrap module** that creates:  
+- An **S3 bucket** for state  
+- An **IAM role** for GitHub OIDC  
+
+This bootstrap step outputs a `backend.tf` file like:  
+
+```hcl
+terraform {
+  backend "s3" {
+    bucket         = "tf-aws-drift-detection-state-1d0d507b"
+    key            = "envs/terraform.tfstate"
+    region         = "us-east-1"
+    use_lockfile   = true
+    encrypt        = true
+  }
+}
 ```
-.
-├─ scripts/
-│  └─ apply_plan_to_code.py   # state→code patcher
-└─ .github/
-   └─ workflows/
-      └─ drift-to-code.yml    # GitHub Actions workflow
-```
+
+Then commit all to your `main` branch.  
 
 ---
 
-## Setup
+### 2. Deploy an S3 bucket for test  
 
-1. Commit `scripts/apply_plan_to_code.py`.  
-2. Add `.github/workflows/drift-to-code.yml` workflow.  
-3. Configure secrets:  
-   - `AWS_OIDC_ROLE_ARN` for AWS OIDC auth  
-   - `PAT_TOKEN` with `repo` scope (needed to open PRs)  
-
----
-
-## Usage
-
-**In CI**  
-- Runs hourly or manually via **Actions → Run workflow**.  
-- Opens PRs with drifted changes synced into `.tf` files.
-
-**Locally**  
 ```bash
-terraform init
-terraform plan -out=tfplan
-terraform show -json tfplan > plan.json
-python3 scripts/apply_plan_to_code.py plan.json
-git diff -- '*.tf'
+terraform init 
+terraform plan  
+terraform apply 
 ```
 
 ---
 
-## License
+### 3. Run the GitHub Action  
+- Manually via **Actions → Run workflow**  
+- Or automatically, every hour via the **cron schedule (`0 * * * *`)**
 
-MIT (or your preferred license).
+
