@@ -2,15 +2,15 @@ name: Detect Drift
 
 on:
   schedule:
-    #- cron: "0 * * * *"   # run every hour
-  workflow_dispatch:       # manual trigger
+    - cron: "0 * * * *"
+  workflow_dispatch:
 
 jobs:
   drift:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
-      contents: read
+      contents: write
       pull-requests: write
 
     steps:
@@ -25,26 +25,39 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.6.6
+          terraform_version: v1.12.2
 
       - name: Terraform Init
         run: terraform init
 
       - name: Terraform Plan (Detect Drift)
-        id: plan
+        run: terraform plan -no-color -out=tfplan
+
+      - name: Export Plan to JSON
+        run: terraform show -json tfplan > plan.json
+
+      - name: Apply Plan Changes to Code (v1)
+        run: python3 scripts/apply_plan_to_code.py plan.json
+
+      - name: Check for .tf changes
+        id: diff
         run: |
-          terraform plan -no-color -out=tfplan > plan_output.txt
-          if grep -q "No changes" plan_output.txt; then
-            echo "drift=false" >> $GITHUB_OUTPUT
+          if git diff --quiet -- '*.tf'; then
+            echo "changed=false" >> $GITHUB_OUTPUT
           else
-            echo "drift=true" >> $GITHUB_OUTPUT
+            echo "changed=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create Drift PR
-        if: steps.plan.outputs.drift == 'true'
+      - name: Create PR with code updates
+        if: steps.diff.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: "Drift detected – reconcile infra"
-          title: "Drift detected in AWS infra"
-          body: "This PR was auto-generated because drift was detected. Please review the plan output."
-          branch: "drift-fix"
+          token: ${{ secrets.PAT_TOKEN }}  # PAT with repo scope
+          commit-message: "Drift → code (v1): synchronize Terraform to plan changes"
+          title: "Drift detected: sync Terraform code to plan (v1)"
+          body: |
+            This PR auto-updates `.tf` files to match drifted attributes detected in AWS.
+            v1 scope: scalars, flat lists/maps. Skips nested blocks & var/local/module-derived expressions.
+          branch: "drift-${{ github.run_id }}"
+          add-paths: |
+            **/*.tf
