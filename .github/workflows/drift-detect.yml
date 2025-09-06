@@ -2,7 +2,7 @@ name: Detect Drift
 
 on:
   schedule:
-    - cron: "0 * * * *"   # run every hour
+    #- cron: "0 * * * *"   # run every hour
   workflow_dispatch:       # manual trigger
 
 jobs:
