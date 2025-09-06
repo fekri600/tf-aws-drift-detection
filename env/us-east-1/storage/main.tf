@@ -10,8 +10,11 @@ resource "aws_s3_bucket" "demo" {
 
 resource "aws_s3_bucket_versioning" "demo" {
   bucket = aws_s3_bucket.demo.id
+
+
   versioning_configuration {
-    status = "Enabled"
+    mfa_delete = ""
+    status = "Suspended"
   }
 }
 
