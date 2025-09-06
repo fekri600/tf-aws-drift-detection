@@ -1,0 +1,31 @@
+module.storage.random_id.suffix: Refreshing state... [id=w50]
+module.storage.aws_s3_bucket.demo: Refreshing state... [id=drift-demo-bucket-c39d]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # module.storage.aws_s3_bucket.demo will be updated in-place
+  ~ resource "aws_s3_bucket" "demo" {
+        id                          = "drift-demo-bucket-c39d"
+      ~ tags                        = {
+          + "Project" = "Terraform Drift Demo"
+        }
+      ~ tags_all                    = {
+          + "Project" = "Terraform Drift Demo"
+        }
+        # (13 unchanged attributes hidden)
+
+        # (3 unchanged blocks hidden)
+    }
+
+Plan: 0 to add, 1 to change, 0 to destroy.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
