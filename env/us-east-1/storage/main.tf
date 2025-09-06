@@ -2,9 +2,7 @@ resource "aws_s3_bucket" "demo" {
   bucket = "drift-demo-bucket-${random_id.suffix.hex}"
   force_destroy = true
 
-  tags = {
-    Project = "Terraform Drift Demo"
-  }
+
 }
 
 resource "random_id" "suffix" {
