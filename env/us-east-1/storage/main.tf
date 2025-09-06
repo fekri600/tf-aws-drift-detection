@@ -5,6 +5,10 @@ resource "aws_s3_bucket" "demo" {
   tags = {
     Project = "Terraform Drift Demo"
   }
+
+  tags = {
+    storage = "shared storage"
+  }
 }
 
 resource "random_id" "suffix" {
