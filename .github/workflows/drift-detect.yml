@@ -1,0 +1,50 @@
+name: Detect Drift
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # run every hour
+  workflow_dispatch:       # manual trigger
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan (Detect Drift)
+        id: plan
+        run: |
+          terraform plan -no-color -out=tfplan > plan_output.txt
+          if grep -q "No changes" plan_output.txt; then
+            echo "drift=false" >> $GITHUB_OUTPUT
+          else
+            echo "drift=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Drift PR
+        if: steps.plan.outputs.drift == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "Drift detected – reconcile infra"
+          title: "Drift detected in AWS infra"
+          body: "This PR was auto-generated because drift was detected. Please review the plan output."
+          branch: "drift-fix"

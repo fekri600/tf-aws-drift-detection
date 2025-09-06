@@ -1,0 +1,191 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "S3StateManagement",
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:ListBucket",
+        "s3:GetBucketAcl",
+        "s3:PutObjectAcl",
+        "s3:CreateBucket"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${state_bucket_name}",
+        "arn:aws:s3:::${state_bucket_name}/terraform/state/*"
+      ]
+    },
+    {
+			"Action": [
+				"s3:GetObject",
+				"s3:PutObject",
+				"s3:DeleteObject",
+				"s3:ListBucket",
+				"s3:GetBucketAcl",
+				"s3:PutObjectAcl",
+				"s3:CreateBucket",
+				"s3:PutBucketVersioning",
+				"s3:PutBucketTagging",
+				"s3:GetBucketTagging",
+				"s3:PutBucketOwnershipControls",
+				"s3:PutBucketPolicy",
+				"s3:DeleteBucketPolicy",
+				"s3:GetBucketLocation",
+				"s3:GetBucketPolicy",
+				"s3:GetBucketPolicyStatus",
+				"s3:GetBucketVersioning",
+				"s3:GetEncryptionConfiguration",
+				"s3:GetBucketCORS",
+				"s3:GetBucketWebsite",
+				"s3:GetAccelerateConfiguration",
+				"s3:GetBucketRequestPayment",
+				"s3:PutBucketRequestPayment",
+				"s3:GetBucketLogging",
+				"s3:PutBucketLogging",
+				"s3:GetLifecycleConfiguration",
+				"s3:PutLifecycleConfiguration",
+				"s3:GetReplicationConfiguration",
+				"s3:PutReplicationConfiguration",
+				"s3:GetBucketObjectLockConfiguration",
+				"s3:PutBucketObjectLockConfiguration",
+				"s3:DeleteBucket",
+				"s3:GetBucketOwnershipControls",
+				"s3:PutBucketOwnershipControls",
+				"s3:PutBucketPublicAccessBlock",
+				"s3:PutEncryptionConfiguration",
+				"s3:GetBucketPublicAccessBlock",
+				"s3:GetEncryptionConfiguration"
+			],
+			"Effect": "Allow",
+			"Resource": [
+				"*"
+			],
+			"Sid": "S3ArtifactManagement"
+		},
+    {
+      "Sid": "DynamoDBManagement",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:CreateTable",
+        "dynamodb:DeleteTable",
+        "dynamodb:UpdateTable",
+        "dynamodb:DescribeTable",
+        "dynamodb:ListTables",
+        "dynamodb:PutItem",
+        "dynamodb:GetItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:Scan",
+        "dynamodb:Query"
+      ],
+      "Resource": "*"
+    },
+    
+    {
+      "Sid": "SSMGetParameter",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameter",
+        "ssm:GetParameters",
+        "ssm:GetParameterHistory",
+        "ssm:DescribeParameters"
+      ],
+      "Resource": "arn:aws:ssm:us-east-1:490004637046:parameter/i2508/oidc/github_trust_role_arn"
+    },
+    {
+      "Sid": "SSMPutParameter",
+      "Effect": "Allow",
+      "Action": [
+        "ssm:PutParameter"
+      ],
+      "Resource": "arn:aws:ssm:us-east-1:490004637046:parameter/*"
+    },
+    {
+      "Sid": "IAMManagement",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:GetRole",
+        "iam:PassRole",
+        "iam:ListRolePolicies",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListInstanceProfilesForRole",
+        "iam:CreateInstanceProfile",
+        "iam:GetInstanceProfile",
+        "iam:DeleteInstanceProfile",
+        "iam:AddRoleToInstanceProfile"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "RDSManagement",
+      "Effect": "Allow",
+      "Action": [
+        "rds:CreateDBInstance",
+        "rds:DeleteDBInstance",
+        "rds:ModifyDBInstance",
+        "rds:DescribeDBInstances",
+        "rds:CreateDBSubnetGroup",
+        "rds:DeleteDBSubnetGroup",
+        "rds:DescribeDBSubnetGroups",
+        "rds:ListTagsForResource",
+        "rds:AddTagsToResource"
+      ],
+      "Resource": "*"
+    },
+    
+    {
+      "Sid": "SNSManagement",
+      "Effect": "Allow",
+      "Action": [
+        "sns:CreateTopic",
+        "sns:DeleteTopic",
+        "sns:Publish",
+        "sns:Subscribe",
+        "sns:Unsubscribe",
+        "sns:GetTopicAttributes",
+        "sns:SetTopicAttributes",
+        "sns:ListTagsForResource",
+        "sns:GetSubscriptionAttributes"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CloudWatchLogging",
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:PutMetricData",
+        "cloudwatch:GetMetricData",
+        "cloudwatch:GetMetricStatistics",
+        "cloudwatch:ListMetrics",
+        "cloudwatch:PutDashboard",
+        "cloudwatch:GetDashboard",
+        "cloudwatch:PutMetricAlarm",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:ListTagsForResource",
+        "cloudwatch:DeleteAlarms",
+        "logs:DeleteLogGroup",
+        "cloudwatch:DeleteDashboards",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:TagResource",
+        "logs:PutRetentionPolicy",
+        "logs:PutMetricFilter",
+        "logs:ListTagsForResource",
+        "logs:DescribeMetricFilters",
+        "logs:DeleteMetricFilter"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
